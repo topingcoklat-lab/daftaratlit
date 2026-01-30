@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Peserta - Landing Page</title>
+    <style>
+        /* --- RESET & BASE STYLES --- */
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-secondary: #64748b;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* --- HEADER SECTION --- */
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 3rem 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- LIST DESIGN --- */
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Header Baris (Judul Kolom) - Ditambah kolom No */
+        .list-header {
+            display: grid;
+            /* No | Nama | JK | Sekolah | Divisi */
+            grid-template-columns: 50px 2.5fr 1fr 2fr 1.5fr; 
+            padding: 0 24px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            gap: 16px;
+        }
+
+        /* Item List (Baris Data) */
+        .list-item {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px 24px;
+            display: grid;
+            grid-template-columns: 50px 2.5fr 1fr 2fr 1.5fr; /* Harus sama dengan header */
+            align-items: center; /* Vertikal center */
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            gap: 16px;
+        }
+
+        .list-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style per Kolom */
+        .col-no {
+            font-weight: 700;
+            color: var(--text-secondary);
+            background: #f1f5f9;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .col-nama {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1rem;
+            /* Pastikan teks panjang membungkus ke bawah, bukan terpotong */
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .col-gender {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .col-school {
+            color: #475569;
+            font-size: 0.95rem;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        /* Kolom Divisi */
+        .col-division .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #dbeafe;
+            white-space: normal; /* Izinkan badge turun jika teks panjang */
+            text-align: center;
+        }
+
+        /* --- LOADING & ERROR --- */
+        #loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- RESPONSIVE MOBILE --- */
+        @media (max-width: 768px) {
+            .list-header {
+                display: none; /* Sembunyikan header kolom di HP */
+            }
+
+            .list-item {
+                grid-template-columns: 1fr; /* Stack vertikal */
+                gap: 12px;
+                padding: 20px;
+                position: relative; /* Untuk posisi nomor absolute */
+            }
+
+            .col-no {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                background: #e2e8f0;
+                color: #475569;
+            }
+
+            .col-nama {
+                font-size: 1.1rem;
+                padding-right: 40px; /* Beri ruang untuk nomor di pojok */
+            }
+
+            /* Label manual untuk tampilan HP */
+            .col-gender::before { content: "Jenis Kelamin: "; font-weight: 600; color: #94a3b8; }
+            .col-school::before { content: "Asal Sekolah: "; font-weight: 600; color: #94a3b8; }
+            .col-division::before { content: "Divisi: "; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>DAFTAR PESERTA POPKAB</h1>
+            <p>Daftar Peserta Yang Sudah Mengisi Form</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Loading Indicator -->
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Mengambil data...</p>
+        </div>
+
+        <!-- Header Kolom -->
+        <div id="list-header" class="list-header" style="display: none;">
+            <div>No</div>
+            <div>Nama Lengkap</div>
+            <div>Jenis Kelamin</div>
+            <div>Asal Sekolah</div>
+            <div>Divisi</div>
+        </div>
+
+        <!-- Container Data -->
+        <div id="data-container" class="list-container"></div>
+    </div>
+
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS9gbJ94h_VbBX-f6BAPDL52gFiAXBp1E_tNzoM-lxrynNR7CrAT7rX9o83YHz5t9De6vsf25LnXHQ/pub?gid=1471213337&single=true&output=csv';
+
+        async function fetchData() {
+            const loadingElement = document.getElementById('loading');
+            const containerElement = document.getElementById('data-container');
+            const headerElement = document.getElementById('list-header');
+
+            try {
+                const response = await fetch(SHEET_URL);
+                if (!response.ok) throw new Error('Gagal koneksi ke Spreadsheet');
+                
+                const csvText = await response.text();
+                // Gunakan parser baru yang lebih akurat
+                const data = parseCSV(csvText);
+                
+                loadingElement.style.display = 'none';
+
+                if (data.length === 0) {
+                    containerElement.innerHTML = '<p style="text-align:center;">Data kosong.</p>';
+                    return;
+                }
+
+                headerElement.style.display = 'grid';
+
+                data.forEach((item, index) => {
+                    // Ambil data
+                    const nama = item['Nama Lengkap'] || item['nama lengkap'] || 'Tanpa Nama';
+                    const gender = item['Jenis Kelamin'] || item['jenis kelamin'] || '-';
+                    const sekolah = item['Asal Sekolah'] || item['asal sekolah'] || '-';
+                    const divisi = item['Divisi'] || item['divisi'] || 'Umum';
+
+                    const itemRow = document.createElement('div');
+                    itemRow.className = 'list-item';
+                    
+                    // Struktur 5 Kolom (Termasuk No)
+                    itemRow.innerHTML = `
+                        <div class="col-no">${index + 1}</div>
+                        <div class="col-nama">${escapeHtml(nama)}</div>
+                        <div class="col-gender">${escapeHtml(gender)}</div>
+                        <div class="col-school">${escapeHtml(sekolah)}</div>
+                        <div class="col-division">
+                            <span class="badge">${escapeHtml(divisi)}</span>
+                        </div>
+                    `;
+                    containerElement.appendChild(itemRow);
+                });
+
+            } catch (error) {
+                console.error(error);
+                loadingElement.style.display = 'none';
+                containerElement.innerHTML = `<div style="color:red; text-align:center;">Error: ${error.message}</div>`;
+            }
+        }
+
+        // --- Parser CSV Manual yang Lebih Kuat ---
+        // Memperbaiki masalah data terpotong saat ada spasi
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return []; // Minimal header + 1 data
+
+            // Ambil header
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const result = [];
+
+            // Loop setiap baris data
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const row = [];
+                let currentVal = '';
+                let inQuotes = false;
+
+                // Parsing per karakter untuk menangani koma dalam kutip
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes; // Toggle status kutip
+                    } else if (char === ',' && !inQuotes) {
+                        // Jika ketemu koma dan TIDAK dalam kutip, berarti ganti kolom
+                        row.push(currentVal.trim().replace(/^"|"$/g, ''));
+                        currentVal = '';
+                    } else {
+                        currentVal += char;
+                    }
+                }
+                // Push nilai kolom terakhir
+                row.push(currentVal.trim().replace(/^"|"$/g, ''));
+
+                // Mapping ke object header
+                if (row.length > 0) {
+                    const obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index] || ''; // Gunakan nilai row atau kosong
+                    });
+                    result.push(obj);
+                }
+            }
+            return result;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return text;
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</body>
+</html>
