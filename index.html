@@ -3,342 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Peserta POPKAB Bantul 2026</title>
+    <title>Daftar Peserta POPKAB Bantul 2026</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* --- RESET & BASE STYLES --- */
-        :root {
-            --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #334155;
-            --text-secondary: #64748b;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --radius: 8px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding-bottom: 50px;
-        }
-
-        /* --- HEADER SECTION --- */
-        header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 3rem 1rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
-        }
-
-        header p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
-            font-weight: 400;
-        }
-
-        /* --- CONTAINER --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* --- LIST DESIGN --- */
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Header Baris (Judul Kolom) - Ditambah kolom No */
-        .list-header {
-            display: grid;
-            /* No | Nama | JK | Sekolah | Divisi */
-            grid-template-columns: 50px 2.5fr 1fr 2fr 1.5fr; 
-            padding: 0 24px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-            gap: 16px;
-        }
-
-        /* Item List (Baris Data) */
-        .list-item {
-            background-color: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 16px 24px;
-            display: grid;
-            grid-template-columns: 50px 2.5fr 1fr 2fr 1.5fr; /* Harus sama dengan header */
-            align-items: center; /* Vertikal center */
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-            gap: 16px;
-        }
-
-        .list-item:hover {
-            transform: translateX(4px);
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Style per Kolom */
-        .col-no {
-            font-weight: 700;
-            color: var(--text-secondary);
-            background: #f1f5f9;
-            width: 30px;
-            height: 30px;
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Styling untuk Nomor Urut */
+        .number-badge {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
-        }
-
-        .col-nama {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 1rem;
-            /* Pastikan teks panjang membungkus ke bawah, bukan terpotong */
-            white-space: normal;
-            word-wrap: break-word;
-        }
-
-        .col-gender {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .col-school {
-            color: #475569;
-            font-size: 0.95rem;
-            white-space: normal;
-            word-wrap: break-word;
-        }
-
-        /* Kolom Divisi */
-        .col-division .badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #dbeafe;
-            white-space: normal; /* Izinkan badge turun jika teks panjang */
-            text-align: center;
-        }
-
-        /* --- LOADING & ERROR --- */
-        #loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
+            background-color: #f1f5f9; /* gray-100 */
+            font-weight: 600;
+            color: #475569; /* slate-600 */
+            flex-shrink: 0;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Styling untuk Badge Divisi */
+        .divisi-badge {
+            background-color: #e0f2fe; /* sky-100 */
+            color: #0369a1; /* sky-700 */
+            padding: 4px 12px;
+            border-radius: 9999px; /* full rounded */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
 
-        /* --- RESPONSIVE MOBILE --- */
-        @media (max-width: 768px) {
-            .list-header {
-                display: none; /* Sembunyikan header kolom di HP */
-            }
-
-            .list-item {
-                grid-template-columns: 1fr; /* Stack vertikal */
-                gap: 12px;
-                padding: 20px;
-                position: relative; /* Untuk posisi nomor absolute */
-            }
-
-            .col-no {
-                position: absolute;
-                top: 16px;
-                right: 16px;
-                background: #e2e8f0;
-                color: #475569;
-            }
-
-            .col-nama {
-                font-size: 1.1rem;
-                padding-right: 40px; /* Beri ruang untuk nomor di pojok */
-            }
-
-            /* Label manual untuk tampilan HP */
-            .col-gender::before { content: "Jenis Kelamin: "; font-weight: 600; color: #94a3b8; }
-            .col-school::before { content: "Asal Sekolah: "; font-weight: 600; color: #94a3b8; }
-            .col-division::before { content: "Divisi: "; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 4px; }
+        /* Styling untuk Dokumen Status */
+        .doc-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #94a3b8; /* slate-400 */
+            width: 40px;
+        }
+        .doc-status-icon {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 24px;
+            width: 24px;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans text-gray-800">
 
-    <header>
-        <div class="container">
-            <h1>DAFTAR PESERTA POPKAB</h1>
-            <p>Daftar Peserta Yang Sudah Mengisi Form</p>
+    <header class="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-400 text-white py-10 shadow-lg">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-2xl md:text-4xl font-bold mb-2 uppercase tracking-wide">
+                DAFTAR PESERTA POPKAB BANTUL 2026
+            </h1>
+            <p class="text-base md:text-lg font-light text-blue-100">
+                Daftar Peserta Yang Sudah Mengisi Form
+            </p>
         </div>
     </header>
 
-    <div class="container">
-        <!-- Loading Indicator -->
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>Mengambil data...</p>
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="w-full md:w-1/3 relative">
+                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Cari Nama atau Sekolah..." 
+                    class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            
+            <div class="flex gap-4 w-full md:w-auto">
+                <select id="filterDivisi" class="w-full md:w-48 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Semua Divisi</option>
+                    </select>
+            </div>
+            
+            <div class="text-sm text-gray-500" id="totalData">
+                Memuat data...
+            </div>
         </div>
 
-        <!-- Header Kolom -->
-        <div id="list-header" class="list-header" style="display: none;">
-            <div>No</div>
-            <div>Nama Lengkap</div>
-            <div>Jenis Kelamin</div>
-            <div>Asal Sekolah</div>
-            <div>Divisi</div>
+        <div id="loading" class="text-center py-10">
+            <div class="loader"></div>
+            <p class="mt-2 text-gray-600">Mengambil data terbaru...</p>
         </div>
 
-        <!-- Container Data -->
-        <div id="data-container" class="list-container"></div>
-    </div>
+        <div id="errorMessage" class="hidden bg-red-100 text-red-700 p-4 rounded mb-4 text-center"></div>
+
+        <div id="cardsContainer" class="space-y-4 hidden">
+            </div>
+        
+        <div id="emptyState" class="hidden text-center py-10 text-gray-500 bg-white rounded-lg shadow-md">
+            <i class="fa-regular fa-folder-open text-4xl mb-2"></i>
+            <p>Data tidak ditemukan.</p>
+        </div>
+
+    </main>
+    
+    <footer class="text-center py-6 text-gray-500 text-sm">
+        &copy; 2026 Panitia POPKAB Bantul. Data diperbarui secara Real-time.
+    </footer>
 
     <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS9gbJ94h_VbBX-f6BAPDL52gFiAXBp1E_tNzoM-lxrynNR7CrAT7rX9o83YHz5t9De6vsf25LnXHQ/pub?gid=1471213337&single=true&output=csv';
+        // URL CSV dari Google Sheets
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS9gbJ94h_VbBX-f6BAPDL52gFiAXBp1E_tNzoM-lxrynNR7CrAT7rX9o83YHz5t9De6vsf25LnXHQ/pub?gid=1471213337&single=true&output=csv';
 
-        async function fetchData() {
-            const loadingElement = document.getElementById('loading');
-            const containerElement = document.getElementById('data-container');
-            const headerElement = document.getElementById('list-header');
+        // Konfigurasi Nama Kolom
+        const COLS = {
+            NAMA: "Nama Lengkap",
+            JK: "Jenis Kelamin",
+            SEKOLAH: "Asal Sekolah",
+            DIVISI: "Divisi",
+            AKTA: "AKTA Kelahiran",
+            PENGANTAR: "Surat Pengantar Sekolah",
+            NISN: "NISN/Kartu Pelajar"
+        };
 
-            try {
-                const response = await fetch(SHEET_URL);
-                if (!response.ok) throw new Error('Gagal koneksi ke Spreadsheet');
-                
-                const csvText = await response.text();
-                // Gunakan parser baru yang lebih akurat
-                const data = parseCSV(csvText);
-                
-                loadingElement.style.display = 'none';
+        let allData = [];
 
-                if (data.length === 0) {
-                    containerElement.innerHTML = '<p style="text-align:center;">Data kosong.</p>';
-                    return;
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            document.getElementById('searchInput').addEventListener('input', renderCards);
+            document.getElementById('filterDivisi').addEventListener('change', renderCards);
+        });
 
-                headerElement.style.display = 'grid';
-
-                data.forEach((item, index) => {
-                    // Ambil data
-                    const nama = item['Nama Lengkap'] || item['nama lengkap'] || 'Tanpa Nama';
-                    const gender = item['Jenis Kelamin'] || item['jenis kelamin'] || '-';
-                    const sekolah = item['Asal Sekolah'] || item['asal sekolah'] || '-';
-                    const divisi = item['Divisi'] || item['divisi'] || 'Umum';
-
-                    const itemRow = document.createElement('div');
-                    itemRow.className = 'list-item';
-                    
-                    // Struktur 5 Kolom (Termasuk No)
-                    itemRow.innerHTML = `
-                        <div class="col-no">${index + 1}</div>
-                        <div class="col-nama">${escapeHtml(nama)}</div>
-                        <div class="col-gender">${escapeHtml(gender)}</div>
-                        <div class="col-school">${escapeHtml(sekolah)}</div>
-                        <div class="col-division">
-                            <span class="badge">${escapeHtml(divisi)}</span>
-                        </div>
-                    `;
-                    containerElement.appendChild(itemRow);
-                });
-
-            } catch (error) {
-                console.error(error);
-                loadingElement.style.display = 'none';
-                containerElement.innerHTML = `<div style="color:red; text-align:center;">Error: ${error.message}</div>`;
-            }
+        function fetchData() {
+            Papa.parse(SHEET_CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        allData = results.data;
+                        populateFilters(allData);
+                        renderCards();
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('cardsContainer').classList.remove('hidden');
+                    } else { showError("Data kosong atau tidak dapat dibaca."); }
+                },
+                error: function(err) { showError("Gagal mengambil data: " + err.message); }
+            });
         }
 
-        // --- Parser CSV Manual yang Lebih Kuat ---
-        // Memperbaiki masalah data terpotong saat ada spasi
-        function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            if (lines.length < 2) return []; // Minimal header + 1 data
+        function populateFilters(data) {
+            const divisiSet = new Set();
+            data.forEach(row => { if(row[COLS.DIVISI]) divisiSet.add(row[COLS.DIVISI].trim()); });
+            const filterSelect = document.getElementById('filterDivisi');
+            Array.from(divisiSet).sort().forEach(div => {
+                const option = document.createElement('option');
+                option.value = div; option.innerText = div; filterSelect.appendChild(option);
+            });
+        }
 
-            // Ambil header
-            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const result = [];
+        function isLinkValid(content) {
+            if (!content) return false;
+            const str = content.toLowerCase();
+            return str.includes('http') || str.includes('drive.google.com') || str.includes('docs.google.com');
+        }
 
-            // Loop setiap baris data
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                const row = [];
-                let currentVal = '';
-                let inQuotes = false;
+        // --- FUNGSI RENDER KARTU ---
+        function renderCards() {
+            const cardsContainer = document.getElementById('cardsContainer');
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filterDivisi = document.getElementById('filterDivisi').value;
+            const totalDataEl = document.getElementById('totalData');
+            const emptyState = document.getElementById('emptyState');
 
-                // Parsing per karakter untuk menangani koma dalam kutip
-                for (let j = 0; j < line.length; j++) {
-                    const char = line[j];
-                    
-                    if (char === '"') {
-                        inQuotes = !inQuotes; // Toggle status kutip
-                    } else if (char === ',' && !inQuotes) {
-                        // Jika ketemu koma dan TIDAK dalam kutip, berarti ganti kolom
-                        row.push(currentVal.trim().replace(/^"|"$/g, ''));
-                        currentVal = '';
+            cardsContainer.innerHTML = '';
+
+            let filteredData = allData.filter(row => {
+                const nama = (row[COLS.NAMA] || "").toLowerCase();
+                const sekolah = (row[COLS.SEKOLAH] || "").toLowerCase();
+                const divisi = (row[COLS.DIVISI] || "");
+                return (nama.includes(searchInput) || sekolah.includes(searchInput)) &&
+                       (filterDivisi === "" || divisi === filterDivisi);
+            });
+
+            totalDataEl.innerText = `Menampilkan ${filteredData.length} peserta`;
+
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+                cardsContainer.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                cardsContainer.classList.remove('hidden');
+            }
+
+            filteredData.forEach((row, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-sm p-5 flex flex-col md:flex-row items-center md:justify-between gap-4 hover:shadow-md transition-shadow duration-200';
+
+                // --- LOGIKA IKON STATUS DOKUMEN ---
+                // Jika Link Valid -> Ceklis Hijau
+                // Jika Kosong/Tidak Valid -> Silang Merah
+                const getIcon = (link) => {
+                    if (isLinkValid(link)) {
+                        return `<a href="${link}" target="_blank" title="Lihat Dokumen" class="doc-status-icon text-green-500 hover:text-green-600 hover:scale-110 transition">
+                                    <i class="fa-solid fa-check text-xl"></i>
+                                </a>`;
                     } else {
-                        currentVal += char;
+                        return `<span title="Belum Ada Dokumen" class="doc-status-icon text-red-300">
+                                    <i class="fa-solid fa-xmark text-xl"></i>
+                                </span>`;
                     }
-                }
-                // Push nilai kolom terakhir
-                row.push(currentVal.trim().replace(/^"|"$/g, ''));
+                };
 
-                // Mapping ke object header
-                if (row.length > 0) {
-                    const obj = {};
-                    headers.forEach((header, index) => {
-                        obj[header] = row[index] || ''; // Gunakan nilai row atau kosong
-                    });
-                    result.push(obj);
-                }
-            }
-            return result;
+                const namaLengkap = row[COLS.NAMA] || "-";
+                const jk = row[COLS.JK] || "-";
+                const sekolah = row[COLS.SEKOLAH] || "-";
+                const divisi = row[COLS.DIVISI] || "-";
+
+                card.innerHTML = `
+                    <div class="flex items-center w-full md:w-auto">
+                        <div class="number-badge mr-5">${index + 1}</div>
+                        <div>
+                            <h2 class="font-bold text-gray-900 text-lg leading-tight uppercase">${namaLengkap}</h2>
+                            <div class="text-sm text-gray-500 mt-1 flex items-center flex-wrap gap-x-2">
+                                <span class="font-medium text-gray-600">${jk}</span>
+                                <span class="text-gray-300">•</span>
+                                <span>${sekolah}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full md:w-auto justify-end mt-2 md:mt-0">
+                        <span class="divisi-badge">${divisi}</span>
+                        
+                        <div class="flex gap-4 border-t md:border-t-0 pt-3 md:pt-0 w-full md:w-auto justify-center md:justify-end border-gray-100">
+                            <div class="doc-status">
+                                <span class="uppercase font-bold tracking-wider text-[10px]">Akta</span>
+                                ${getIcon(row[COLS.AKTA])}
+                            </div>
+                            <div class="doc-status">
+                                <span class="uppercase font-bold tracking-wider text-[10px]">Pntr</span>
+                                ${getIcon(row[COLS.PENGANTAR])}
+                            </div>
+                            <div class="doc-status">
+                                <span class="uppercase font-bold tracking-wider text-[10px]">NISN</span>
+                                ${getIcon(row[COLS.NISN])}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
         }
 
-        function escapeHtml(text) {
-            if (!text) return text;
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function showError(msg) {
+            const errEl = document.getElementById('errorMessage');
+            errEl.innerText = msg;
+            errEl.classList.remove('hidden');
+            document.getElementById('loading').classList.add('hidden');
         }
-
-        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
